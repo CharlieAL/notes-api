@@ -1,6 +1,9 @@
 package com.charlie.spring_course.controllers
 
 import com.charlie.spring_course.security.AuthService
+import jakarta.validation.Valid
+import jakarta.validation.constraints.Email
+import jakarta.validation.constraints.Pattern
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -12,7 +15,12 @@ class AuthController(
     private val authService: AuthService
 ) {
     data class AuthRequest(
+        @field:Email(message = "Invalid email format")
         val email: String,
+        @field:Pattern(
+            regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,}$",
+            message = "Password must be at least 6 characters long and contain letters and numbers"
+        )
         val password: String
     )
 
@@ -22,7 +30,7 @@ class AuthController(
 
     @PostMapping("/register")
     fun register(
-        @RequestBody body: AuthRequest
+        @Valid @RequestBody body: AuthRequest
     ) {
         authService.register(
             email = body.email,

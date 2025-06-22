@@ -2,7 +2,10 @@ package com.charlie.spring_course.controllers
 
 import com.charlie.spring_course.database.models.Note
 import com.charlie.spring_course.database.repository.NoteRepository
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
 import org.bson.types.ObjectId
+import org.springframework.http.HttpStatusCode
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.server.ResponseStatusException
 import java.time.Instant
 
 @RestController
@@ -22,6 +26,7 @@ class NoteController(
 
     data class NoteRequest(
         val id: String?,
+        @field:NotBlank(message = "Title cannot be blank")
         val title: String,
         val content: String,
         val color: Long,
@@ -37,7 +42,7 @@ class NoteController(
 
     @PostMapping
     fun save(
-        @RequestBody body: NoteRequest
+        @Valid @RequestBody body: NoteRequest
     ): NoteResponse {
         val ownerId = SecurityContextHolder.getContext().authentication.principal as String
         val note = repository.save(
@@ -65,7 +70,7 @@ class NoteController(
     fun deleteById(@PathVariable id: String) {
         val ownerId = SecurityContextHolder.getContext().authentication.principal as String
         val note = noteRepository.findById(ObjectId(id)).orElseThrow {
-            IllegalArgumentException("Note not found")
+            throw ResponseStatusException(HttpStatusCode.valueOf(400), "Note not found")
         }
 
         if (note.ownerId.toHexString() == ownerId) {
