@@ -8,14 +8,16 @@ import com.charlie.spring_course.domain.ports.outgoing.RefreshTokenRepository
 import com.charlie.spring_course.domain.ports.outgoing.UserRepository
 import com.charlie.spring_course.infrastructure.security.HashEncoder
 import com.charlie.spring_course.infrastructure.security.JwtServiceImpl
-import org.bson.types.ObjectId
 import org.springframework.http.HttpStatusCode
 import org.springframework.security.authentication.BadCredentialsException
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 import java.security.MessageDigest
 import java.time.Instant
 import java.util.Base64
 
+@Service
 class AuthService(
     private val jwtServiceImpl: JwtServiceImpl,
     private val userRepository: UserRepository,
@@ -60,6 +62,7 @@ class AuthService(
 
     }
 
+    @Transactional
     override fun refreshToken(token: String): TokenPair {
         if (!jwtServiceImpl.validateRefreshToken(token)) {
             throw ResponseStatusException(HttpStatusCode.valueOf(401), "Invalid refresh token")
