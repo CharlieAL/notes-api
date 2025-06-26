@@ -1,4 +1,4 @@
-package com.charlie.spring_course.security
+package com.charlie.spring_course.infrastructure.security
 
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
@@ -10,7 +10,7 @@ import org.springframework.web.filter.OncePerRequestFilter
 
 @Component
 class JwtAuthFilter(
-    private val jwtService: JwtService
+    private val jwtService: JwtServiceImpl
 ) : OncePerRequestFilter() {
 
     override fun doFilterInternal(

@@ -1,5 +1,6 @@
-package com.charlie.spring_course.security
+package com.charlie.spring_course.infrastructure.security
 
+import com.charlie.spring_course.domain.ports.outgoing.JwtService
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
@@ -11,9 +12,9 @@ import java.util.Base64
 import java.util.Date
 
 @Service
-class JwtService(
+class JwtServiceImpl(
     @Value("\${jwt.secret}") private val jwtSecret: String
-) {
+) : JwtService {
     private val secretkey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(jwtSecret))
     private val accessTokenValidityMs = 15L * 60L * 1000L // 15 minutes
     val refreshTokenValidityMs = 7L * 24L * 60L * 60L * 1000L // 7 days
@@ -34,27 +35,27 @@ class JwtService(
             .compact()
     }
 
-    fun generateAccessToken(userId: String): String {
+    override fun generateAccessToken(userId: String): String {
         return generateToken(userId, "access", accessTokenValidityMs)
     }
 
-    fun generateRefreshToken(userId: String): String {
+    override fun generateRefreshToken(userId: String): String {
         return generateToken(userId, "refresh", refreshTokenValidityMs)
     }
 
-    fun validateAccessToken(token: String): Boolean {
+    override fun validateAccessToken(token: String): Boolean {
         val claims = parseAllClaims(token) ?: return false
         val tokenType = claims["type"] as? String ?: return false
         return tokenType == "access"
     }
 
-    fun validateRefreshToken(token: String): Boolean {
+    override fun validateRefreshToken(token: String): Boolean {
         val claims = parseAllClaims(token) ?: return false
         val tokenType = claims["type"] as? String ?: return false
         return tokenType == "refresh"
     }
 
-    fun getUserIdFromToken(token: String): String {
+    override fun getUserIdFromToken(token: String): String {
         val claims =
             parseAllClaims(token) ?: throw ResponseStatusException(HttpStatusCode.valueOf(401), "Invalid token")
         return claims.subject

@@ -1,4 +1,4 @@
-package com.charlie.spring_course.security
+package com.charlie.spring_course.infrastructure.security
 
 import jakarta.servlet.DispatcherType
 import org.springframework.context.annotation.Bean

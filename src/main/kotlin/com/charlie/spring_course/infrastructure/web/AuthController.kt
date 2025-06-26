@@ -1,6 +1,5 @@
-package com.charlie.spring_course.controllers
-
-import com.charlie.spring_course.security.AuthService
+import com.charlie.spring_course.application.service.AuthService
+import com.charlie.spring_course.domain.models.TokenPair
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.Pattern
@@ -41,7 +40,7 @@ class AuthController(
     @PostMapping("/login")
     fun login(
         @RequestBody body: AuthRequest
-    ): AuthService.TokenPair {
+    ): TokenPair {
         return authService.login(
             email = body.email,
             password = body.password
@@ -51,9 +50,9 @@ class AuthController(
     @PostMapping("/refresh")
     fun refresh(
         @RequestBody body: RefreshRequest
-    ): AuthService.TokenPair {
-        return authService.refresh(
-            refreshToken = body.refreshToken
+    ): TokenPair {
+        return authService.refreshToken(
+            token = body.refreshToken
         )
     }
 
